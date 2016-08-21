@@ -59,7 +59,7 @@ class GLM(model.Model):
         """
         X = tf.placeholder(tf.float32, [None, self.X.shape[1]])
         Y = tf.placeholder(tf.float32, [None, 1])
-        beta = tf.Variable(tf.zeros([self.z_no, 1]))
+        beta = tf.Variable(self.family.get_initial_values(len(self.X_names)))
         theta = tf.matmul(X, tf.gather(beta, list(range(self.X.shape[1]))))
 
         # Check for dispersion latent variables
@@ -72,7 +72,6 @@ class GLM(model.Model):
         if self.family.dof is False:
             dof = tf.constant(0.0)
         else:
-            beta = tf.scatter_update(beta, [self.z_no-2], [4.0])
             dof = tf.exp(tf.gather(beta, [self.z_no-2])) # change to something else
 
         return beta, X, Y, self.neg_loglikelihood(Y, theta, scale, dof)

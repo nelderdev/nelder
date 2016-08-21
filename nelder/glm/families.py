@@ -40,6 +40,20 @@ class Normal(object):
         """
         return -tf.contrib.distributions.Normal(theta, scale).log_likelihood(Y)
 
+    def get_initial_values(self, feature_no):
+        """
+        Parameters
+        -------
+        feature_no - int
+            Number of features in the model
+
+        Returns
+        -------
+        - An tf.Tensor with the initial values
+        """
+        return tf.zeros([feature_no+self.additional_variables, 1])
+
+
 class Poisson(object):
 
     def __init__(self):
@@ -74,8 +88,20 @@ class Poisson(object):
         -------
         - An tf.placeholder with the negative loglikelihood 
         """
-
         return tf.reduce_mean(-tf.reduce_sum(Y*theta - tf.exp(theta)))
+
+    def get_initial_values(self, feature_no):
+        """
+        Parameters
+        -------
+        feature_no - int
+            Number of features in the model
+
+        Returns
+        -------
+        - An tf.Tensor with the initial values
+        """
+        return tf.zeros([feature_no+self.additional_variables, 1])
 
 
 class StudentT(object):
@@ -114,4 +140,15 @@ class StudentT(object):
         """
         return -tf.contrib.distributions.StudentT(dof, theta, scale).log_likelihood(Y)
 
+    def get_initial_values(self, feature_no):
+        """
+        Parameters
+        -------
+        feature_no - int
+            Number of features in the model
 
+        Returns
+        -------
+        - An tf.Tensor with the initial values
+        """
+        return tf.sparse_tensor_to_dense(tf.SparseTensor([[feature_no+self.additional_variables-2,0]], [4.0], [feature_no+self.additional_variables, 1]))
